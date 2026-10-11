@@ -1,0 +1,27 @@
+name: Build Android App
+
+on:
+  push:
+      branches: [ main ]
+
+      jobs:
+        build:
+            runs-on: ubuntu-latest
+                steps:
+                      - name: Checkout code
+                              uses: actions/checkout@v4
+
+                                    - name: Set up JDK 17
+                                            uses: actions/setup-java@v4
+                                                    with:
+                                                              distribution: 'temurin'
+                                                                        java-version: '17'
+
+                                                                              - name: Create basic Gradle project structure
+                                                                                      run: |
+                                                                                                mkdir -p app/src/main/java/com/example/czytnik
+                                                                                                          echo "android { namespace 'com.example.czytnik' compileSdk 34 }" > app/build.gradle
+
+                                                                                                                - name: Build placeholder APK
+                                                                                                                        run: echo "Gotowe"
+                                                                                                                        
