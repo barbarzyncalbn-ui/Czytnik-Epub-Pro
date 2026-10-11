@@ -17,10 +17,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Generate APK Package
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Gradle Project
         run: |
-          mkdir -p app/src/main/java/com/example/czytnik app/src/main/res/values app/build/outputs/apk/debug
-          
+          mkdir -p app/src/main/java/com/example/czytnik app/src/main/res/values
           echo "include ':app'" > settings.gradle
           echo "rootProject.name='CzytnikEpub'" >> settings.gradle
           echo "apply plugin: 'com.android.application'" > app/build.gradle
@@ -30,10 +32,11 @@ jobs:
           echo '<resources><string name="app_name">Czytnik Epub</string></resources>' > app/src/main/res/values/strings.xml
           echo "package com.example.czytnik; import android.app.Activity; import android.os.Bundle; public class MainActivity extends Activity { @Override protected void onCreate(Bundle s) { super.onCreate(s); } }" > app/src/main/java/com/example/czytnik/MainActivity.java
 
-          # Utworzenie prawidłowego, gotowego do instalacji pliku APK za pomocą wbudowanego archiwum zip
-          cd app/src/main
-          zip -r ../../../app/build/outputs/apk/debug/app-debug.apk *
-          cd ../..
+          # Inicjalizacja wrapperów Gradle
+          gradle wrapper
+
+      - name: Build APK with Gradle
+        run: ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
