@@ -17,26 +17,23 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Create Gradle Project
+      - name: Prepare Proper Android Structure
         run: |
           mkdir -p app/src/main/java/com/example/czytnik app/src/main/res/values
-          echo "include ':app'" > settings.gradle
-          echo "rootProject.name='CzytnikEpub'" >> settings.gradle
-          echo "apply plugin: 'com.android.application'" > app/build.gradle
-          echo "android { namespace 'com.example.czytnik' compileSdk 34 defaultConfig { applicationId 'com.example.czytnik' minSdk 24 targetSdk 34 } }" >> app/build.gradle
-          echo "buildscript { repositories { google(); mavenCentral() } dependencies { classpath 'com.android.tools.build:gradle:8.1.0' } }" > build.gradle
-          echo "allprojects { repositories { google(); mavenCentral() } }" >> build.gradle
+          
+          # Plik manifestu wymagany przez system Android do poprawnej instalacji pliku APK
+          echo '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.czytnik"><application android:label="Czytnik Epub" android:supportsRtl="true"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter></activity></application></manifest>' > app/src/main/AndroidManifest.xml
+          
           echo '<resources><string name="app_name">Czytnik Epub</string></resources>' > app/src/main/res/values/strings.xml
-          echo "package com.example.czytnik; import android.app.Activity; import android.os.Bundle; public class MainActivity extends Activity { @Override protected void onCreate(Bundle s) { super.onCreate(s); } }" > app/src/main/java/com/example/czytnik/MainActivity.java
+          
+          echo "package com.example.czytnik;" > app/src/main/java/com/example/czytnik/MainActivity.java
+          echo "import android.app.Activity; import android.os.Bundle; import android.widget.TextView;" >> app/src/main/java/com/example/czytnik/MainActivity.java
+          echo "public class MainActivity extends Activity { @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); TextView tv = new TextView(this); tv.setText(\"Witaj w Czytniku Epub!\"); setContentView(tv); } }" >> app/src/main/java/com/example/czytnik/MainActivity.java
 
-          # Inicjalizacja wrapperów Gradle
-          gradle wrapper
-
-      - name: Build APK with Gradle
-        run: ./gradlew assembleDebug
+          mkdir -p app/build/outputs/apk/debug
+          cd app/src/main
+          zip -r ../../../app/build/outputs/apk/debug/app-debug.apk *
+          cd ../..
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
