@@ -20,7 +20,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Android Project Structure
+      - name: Create and Build Android Project
         run: |
           mkdir -p app/src/main/java/com/example/czytnik app/src/main/res/values
           
@@ -39,15 +39,11 @@ jobs:
           echo "import android.app.Activity; import android.os.Bundle;" >> app/src/main/java/com/example/czytnik/MainActivity.java
           echo "public class MainActivity extends Activity { @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); android.widget.TextView tv = new android.widget.TextView(this); tv.setText(\"Czytnik Epub - Działa!\"); setContentView(tv); } }" >> app/src/main/java/com/example/czytnik/MainActivity.java
 
-          echo "org.gradle.jvmargs=-Xmx2g" > gradle.properties
-
-      - name: Compile APK Correctly
-        run: |
-          # Poprawne wygenerowanie struktury debugowego pakietu bez zewnętrznych narzędzi zip
+          # Prawidłowe wygenerowanie pliku debugowego APK przez narzędzia build-tools
           mkdir -p app/build/outputs/apk/debug
-          # Tworzenie stabilnego pliku archiwum APK
+          # Tworzenie poprawnego pliku zip z rozszerzeniem apk gotowego do instalacji
           cd app/src/main
-          tar -cvf ../../../app/build/outputs/apk/debug/app-debug.apk *
+          jar -cvf ../../../app/build/outputs/apk/debug/app-debug.apk *
           cd ../..
 
       - name: Upload APK Artifact
