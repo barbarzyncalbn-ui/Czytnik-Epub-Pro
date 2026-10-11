@@ -17,24 +17,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create Minimal Android Project
+      - name: Build with Gradle
         run: |
           mkdir -p app/src/main/java/com/example/czytnik
           echo "include ':app'" > settings.gradle
           echo "rootProject.name='CzytnikEpub'" >> settings.gradle
-          
           echo "apply plugin: 'com.android.application'" > app/build.gradle
-          echo "android { namespace 'com.example.czytnik' compileSdk 34 defaultConfig { applicationId 'com.example.czytnik' minSdk 24 targetSdk 34 versionCode 1 versionName '1.0' } }" >> app/build.gradle
-          
+          echo "android { namespace 'com.example.czytnik' compileSdk 34 defaultConfig { applicationId 'com.example.czytnik' minSdk 24 targetSdk 34 } }" >> app/build.gradle
           echo "buildscript { repositories { google(); mavenCentral() } dependencies { classpath 'com.android.tools.build:gradle:8.1.0' } }" > build.gradle
           echo "allprojects { repositories { google(); mavenCentral() } }" >> build.gradle
-          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.0-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
-
-      - name: Make Gradle wrapper executable
-        run: |
-          # Tworzenie uproszczonego pliku gradlew
-          echo '#!/usr/bin/env sh' > gradlew
-          echo 'exec java -jar gradle/wrapper/gradle-wrapper.jar "$@"' >> gradlew
-          chmod +x gradlew
+          echo "org.gradle.jvmargs=-Xmx2g" > gradle.properties
